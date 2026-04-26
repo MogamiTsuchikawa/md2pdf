@@ -30,13 +30,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex: 0 0 auto;
   border-radius: 8px;
-  color: #0f766e;
-  background: #d8f3ee;
-  border: 1px solid #b9e3dc;
+  background: #ecfdf9;
+  border: 1px solid #b7ded6;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+.brand-mark img {
+  display: block;
+  width: 38px;
+  height: 38px;
 }
 
 .brand h1,
@@ -54,7 +60,7 @@
 }
 
 .brand p {
-  max-width: 32vw;
+  max-width: min(460px, 42vw);
   overflow: hidden;
   color: var(--muted);
   font-size: 13px;
@@ -153,22 +159,32 @@ button:focus-visible {
   font-weight: 750;
 }
 
-.editor-panel textarea {
+.markdown-editor-shell {
   flex: 1;
   width: 100%;
   min-height: 520px;
-  resize: none;
-  border: 0;
-  padding: 18px;
-  color: var(--editor-ink);
+  overflow: hidden;
   background: var(--editor-bg);
-  font: 14px/1.65 var(--mono);
-  letter-spacing: 0;
-  outline: none;
 }
 
-.editor-panel textarea:focus {
+.markdown-editor-shell .monaco-editor,
+.markdown-editor-shell .monaco-editor-background,
+.markdown-editor-shell .monaco-editor .margin {
+  background: var(--editor-bg);
+}
+
+.markdown-editor-shell:focus-within {
   box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.editor-loading {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 18px;
+  color: var(--muted);
+  background: var(--editor-bg);
+  font: 13px/1.4 var(--sans);
 }
 
 .style-panel {
@@ -756,7 +772,7 @@ button:focus-visible {
     border-bottom: 1px solid var(--line);
   }
 
-  .editor-panel textarea {
+  .markdown-editor-shell {
     min-height: 320px;
   }
 

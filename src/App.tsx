@@ -5,7 +5,9 @@ import {
   type MouseEvent,
   type ReactElement,
   type ReactNode,
+  Suspense,
   isValidElement,
+  lazy,
   useCallback,
   useEffect,
   useId,
@@ -21,7 +23,6 @@ import ReactMarkdown, {
 import remarkGfm from 'remark-gfm'
 import mermaid from 'mermaid'
 import {
-  FileText,
   Printer,
   RotateCcw,
   RotateCw,
@@ -29,6 +30,8 @@ import {
   X,
 } from 'lucide-react'
 import './App.css'
+
+const MarkdownEditor = lazy(() => import('./MarkdownEditor'))
 
 export type Rotation = 'none' | 'clockwise' | 'counterclockwise'
 export type RotatableKind = 'image' | 'mermaid'
@@ -79,6 +82,7 @@ const STORAGE_MARKDOWN = 'md2pdf:markdown'
 const STORAGE_FILE_NAME = 'md2pdf:fileName'
 const STORAGE_ROTATIONS = 'md2pdf:rotations'
 const STORAGE_DOCUMENT_STYLE = 'md2pdf:documentStyle'
+const APP_TAGLINE = 'オンブラウザで動くmarkdownをpdf印刷するアプリ'
 
 const FONT_OPTIONS: Array<{ id: FontChoice; label: string }> = [
   { id: 'system', label: 'Sans' },
@@ -490,11 +494,11 @@ function App() {
       <header className="app-toolbar no-print">
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
-            <FileText size={20} />
+            <img src="/favicon.svg" alt="" />
           </span>
           <div>
             <h1>md2pdf</h1>
-            <p>{fileName}</p>
+            <p>{APP_TAGLINE}</p>
           </div>
         </div>
         <div className="toolbar-actions">
@@ -541,12 +545,15 @@ function App() {
             onPresetChange={handleStylePresetChange}
             onChange={handleStyleChange}
           />
-          <textarea
-            value={markdown}
-            spellCheck={false}
-            onChange={(event) => setMarkdown(event.target.value)}
-            aria-label="Markdown source"
-          />
+          <Suspense
+            fallback={
+              <div className="markdown-editor-shell">
+                <div className="editor-loading">Editor loading...</div>
+              </div>
+            }
+          >
+            <MarkdownEditor value={markdown} onChange={setMarkdown} />
+          </Suspense>
         </aside>
 
         <section className="preview-panel" aria-label="PDF preview">
