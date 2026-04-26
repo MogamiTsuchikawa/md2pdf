@@ -27,6 +27,18 @@ npm run build
 
 ビルド成果物は `dist/` に出力されます。静的ファイルとして配信できるため、Vercel、Netlify、Cloudflare Pages などにデプロイできます。
 
+## Promotion Video
+
+Remotion で 1920x1080 / 30fps / 30秒のプロモーション動画を生成できます。
+
+```bash
+npm run video:studio
+npm run video:still
+npm run video:render
+```
+
+`video:still` は `out/md2pdf-promo-frame.png`、`video:render` は `out/md2pdf-promo.mp4` を出力します。
+
 ## PDF Export
 
 アプリ内で直接 PDF ファイルを生成するのではなく、`PDFプレビュー / 出力` ボタンからブラウザの印刷プレビューを開き、保存先として PDF を選びます。
