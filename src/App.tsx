@@ -219,6 +219,10 @@ mermaid.initialize({
     curve: 'basis',
     htmlLabels: true,
   },
+  sequence: {
+    diagramMarginX: 0,
+    diagramMarginY: 0,
+  },
 })
 
 function App() {
@@ -303,12 +307,9 @@ function App() {
         currentHeight = carriedHeading ? carriedHeading.height : 0
       }
 
-      currentPage.push({
-        height: childHeight,
-        html: child.outerHTML,
-        isHeading: isHeadingElement(child),
-      })
-      currentHeight += childHeight
+      const childItem = createPaginatedItem(child, pageHeight - currentHeight)
+      currentPage.push(childItem)
+      currentHeight += childItem.height
     }
 
     if (currentPage.length > 0) {
@@ -1038,6 +1039,38 @@ function getElementOuterHeight(element: Element) {
   return rect.height + marginTop + marginBottom
 }
 
+function createPaginatedItem(element: Element, availableHeight: number): PaginatedItem {
+  const height = getElementOuterHeight(element)
+  let itemHeight = height
+  let html = element.outerHTML
+
+  if (isRotatedBlock(element) && availableHeight > 0) {
+    const margins = getElementVerticalMargins(element)
+    const frameHeight = Math.max(0, Math.min(height - margins, availableHeight - margins))
+
+    if (frameHeight > 0) {
+      const clone = element.cloneNode(true) as Element
+      setStyleProperty(clone, '--rotated-frame-height', `${frameHeight}px`)
+      html = clone.outerHTML
+      itemHeight = frameHeight + margins
+    }
+  }
+
+  return {
+    height: itemHeight,
+    html,
+    isHeading: isHeadingElement(element),
+  }
+}
+
+function getElementVerticalMargins(element: Element) {
+  const styles = window.getComputedStyle(element)
+  const marginTop = Number.parseFloat(styles.marginTop) || 0
+  const marginBottom = Number.parseFloat(styles.marginBottom) || 0
+
+  return marginTop + marginBottom
+}
+
 function getCarriedHeading(items: PaginatedItem[]) {
   const lastItem = items.at(-1)
 
@@ -1050,6 +1083,25 @@ function getCarriedHeading(items: PaginatedItem[]) {
 
 function isHeadingElement(element: Element) {
   return /^H[1-6]$/.test(element.tagName)
+}
+
+function isRotatedBlock(element: Element): element is HTMLElement {
+  return (
+    element.classList.contains('rotatable-block') &&
+    element.getAttribute('data-rotation') !== null &&
+    element.getAttribute('data-rotation') !== 'none'
+  )
+}
+
+function setStyleProperty(element: Element, property: `--${string}`, value: string) {
+  if (element instanceof HTMLElement) {
+    element.style.setProperty(property, value)
+    return
+  }
+
+  const currentStyle = element.getAttribute('style')
+  const separator = currentStyle && currentStyle.trim().endsWith(';') ? ' ' : '; '
+  element.setAttribute('style', `${currentStyle ?? ''}${separator}${property}: ${value};`)
 }
 
 function areStringArraysEqual(first: string[], second: string[]) {
