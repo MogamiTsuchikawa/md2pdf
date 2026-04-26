@@ -608,6 +608,7 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   overflow: hidden;
   width: 100%;
   min-height: 90px;
@@ -680,17 +681,23 @@ button:focus-visible {
 .rotatable-block.is-rotated .rotatable-frame {
   height: 100%;
   min-height: 0;
+  contain: layout paint;
 }
 
 .rotatable-block.is-rotated .rotatable-content {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: var(--printable-width);
+  top: 0;
   width: var(--rotated-frame-height);
   height: var(--printable-width);
   max-width: none;
-  transform: translate(-50%, -50%) rotate(var(--rotation-angle));
-  transform-origin: center;
+  transform: rotate(var(--rotation-angle));
+  transform-origin: top left;
+}
+
+.rotatable-block.is-rotated[data-rotation='counterclockwise'] .rotatable-content {
+  left: 0;
+  top: var(--rotated-frame-height);
 }
 
 .rotatable-block.is-rotated .rotatable-content > img,
@@ -871,24 +878,30 @@ button:focus-visible {
   }
 
   .rotatable-block.is-rotated .rotatable-frame {
-    width: calc(210mm - 28mm);
+    width: var(--printable-width);
     height: 100%;
     min-height: 0;
   }
 
   .rotatable-block.is-rotated .rotatable-content {
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: var(--printable-width);
+    top: 0;
     width: var(--rotated-frame-height);
-    height: calc(210mm - 28mm);
+    height: var(--printable-width);
     padding: 0;
-    transform: translate(-50%, -50%) rotate(var(--rotation-angle));
+    transform: rotate(var(--rotation-angle));
+    transform-origin: top left;
+  }
+
+  .rotatable-block.is-rotated[data-rotation='counterclockwise'] .rotatable-content {
+    left: 0;
+    top: var(--rotated-frame-height);
   }
 
   .rotatable-block.is-rotated .rotatable-content > img,
   .rotatable-block.is-rotated .mermaid-output svg {
     max-width: var(--rotated-frame-height);
-    max-height: calc(210mm - 28mm);
+    max-height: var(--printable-width);
   }
 }
