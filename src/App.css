@@ -533,7 +533,7 @@ button:focus-visible {
 
 .rotatable-block {
   --rotation-angle: 90deg;
-  --rotated-frame-height: min(70vh, calc(var(--printable-height) - 30mm));
+  --rotated-frame-height: calc(var(--printable-height) - 30mm);
 
   position: relative;
   clear: both;
@@ -720,7 +720,7 @@ button:focus-visible {
   overflow: visible;
 }
 
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
   .app-toolbar {
     position: static;
     align-items: flex-start;
@@ -769,12 +769,16 @@ button:focus-visible {
     height: 100%;
     min-height: 0;
   }
+
+  .pagination-measure .rotatable-block.is-rotated {
+    --rotated-frame-height: calc(var(--printable-height) - 30mm);
+  }
 }
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 14mm;
+    margin: 0;
   }
 
   html,
@@ -818,12 +822,12 @@ button:focus-visible {
   }
 
   .pdf-page {
-    width: auto;
-    height: auto;
+    width: var(--page-width);
+    height: var(--page-height);
     min-height: 0;
     margin: 0;
-    padding: 0;
-    overflow: visible;
+    padding: var(--page-margin);
+    overflow: hidden;
     break-after: page;
     page-break-after: always;
     box-shadow: none;
@@ -861,8 +865,6 @@ button:focus-visible {
   }
 
   .rotatable-block.is-rotated {
-    --rotated-frame-height: calc(297mm - 58mm);
-
     height: var(--rotated-frame-height);
     min-height: 0;
     margin: 0;
