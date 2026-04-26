@@ -55,6 +55,12 @@ type DocumentStyleSettings = {
   h5Size: number
 }
 
+type PaginatedItem = {
+  height: number
+  html: string
+  isHeading: boolean
+}
+
 type RotatableBlockProps = {
   kind: RotatableKind
   id: string
@@ -278,7 +284,7 @@ function App() {
     }
 
     const nextPages: string[] = []
-    let currentPage: string[] = []
+    let currentPage: PaginatedItem[] = []
     let currentHeight = 0
 
     for (const child of children) {
@@ -287,17 +293,26 @@ function App() {
         currentPage.length > 0 && currentHeight + childHeight > pageHeight + 0.5
 
       if (wouldOverflow) {
-        nextPages.push(currentPage.join(''))
-        currentPage = []
-        currentHeight = 0
+        const carriedHeading = getCarriedHeading(currentPage)
+
+        if (currentPage.length > 0) {
+          nextPages.push(currentPage.map((item) => item.html).join(''))
+        }
+
+        currentPage = carriedHeading ? [carriedHeading] : []
+        currentHeight = carriedHeading ? carriedHeading.height : 0
       }
 
-      currentPage.push(child.outerHTML)
+      currentPage.push({
+        height: childHeight,
+        html: child.outerHTML,
+        isHeading: isHeadingElement(child),
+      })
       currentHeight += childHeight
     }
 
     if (currentPage.length > 0) {
-      nextPages.push(currentPage.join(''))
+      nextPages.push(currentPage.map((item) => item.html).join(''))
     }
 
     setPagesHtml((current) =>
@@ -1021,6 +1036,20 @@ function getElementOuterHeight(element: Element) {
   const marginBottom = Number.parseFloat(styles.marginBottom) || 0
 
   return rect.height + marginTop + marginBottom
+}
+
+function getCarriedHeading(items: PaginatedItem[]) {
+  const lastItem = items.at(-1)
+
+  if (!lastItem?.isHeading) {
+    return undefined
+  }
+
+  return items.pop()
+}
+
+function isHeadingElement(element: Element) {
+  return /^H[1-6]$/.test(element.tagName)
 }
 
 function areStringArraysEqual(first: string[], second: string[]) {
